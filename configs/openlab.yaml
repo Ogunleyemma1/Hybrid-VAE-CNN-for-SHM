@@ -1,0 +1,102 @@
+# configs/openlab.yaml
+# openLAB experiment (real monitoring data).
+# This config supports the full hybrid pipeline:
+#   1) VAE gating: Normal vs (SF or E candidate)
+#   2) CNN classification: Structural fault (SF) vs Environmental/other effects (E)
+
+project:
+  seed: 7
+
+paths:
+  experiment_dir: experiments/openlab
+  datasets_dir: experiments/openlab/datasets
+  raw_dir: experiments/openlab/datasets/raw
+  processed_dir: experiments/openlab/datasets/processed
+  outputs_dir: experiments/openlab/outputs
+
+openlab_source:
+  doi: "10.25532/OPARA-852"
+  license: "CC-BY-SA-4.0"
+  measurement_files:
+    - MD_2025_05_06_09_08_25.txt
+    - MD_2025_05_06_10_43_20.txt
+    - MD_2025_05_06_12_05_10.txt
+    - MD_2025_05_06_13_43_17.txt
+    - MD_2025_05_06_16_07_15.txt
+    - MD_2025_05_06_17_39_40.txt
+    - MD_2025_05_06_18_30_51.txt
+
+channels:
+  # Define channels used by the pipeline (indices are 0-based after selecting columns)
+  # Adjust these to your actual processed channel selection.
+  vae_input_channels: [0, 1, 2, 3]     # e.g., displacement sensors subset
+  cnn_input_channels: [0, 1, 2, 3]     # can differ from VAE channels
+
+preprocessing:
+  # Based on dataset notes (outlier filter + moving average)
+  outlier_filter:
+    enabled: true
+    delta_mm_threshold: 1.0
+    abs_mm_threshold: 65.0
+  moving_average:
+    enabled: true
+    window: 5
+
+data:
+  windowing:
+    window: 256
+    stride: 64
+  splits:
+    train_ratio: 0.4
+    val_ratio: 0.3
+    test_ratio: 0.3
+    # split mode should be run-level for leakage prevention
+    mode: run_level
+
+labels:
+  # consistent naming across repository
+  normal: normal
+  structural_fault: structural_fault
+  environmental: environmental
+
+normalization:
+  method: standard
+  clip: 10.0
+
+vae:
+  latent_dim: 3
+  hidden_dim: 128
+  num_layers: 2
+  dropout: 0.2
+  kl_anneal:
+    enabled: true
+    warmup_ratio: 0.30
+
+training:
+  batch_size: 256
+  epochs: 120
+  lr: 5.0e-4
+  grad_clip_norm: 2.0
+
+cnn:
+  enabled: true
+  batch_size: 256
+  epochs: 60
+  lr: 1.0e-3
+  weight_decay: 0.0
+
+pipeline:
+  # VAE gate: classify as "normal" if recon error <= threshold
+  # threshold is typically determined on validation normal windows.
+  vae_gate:
+    metric: mse
+    threshold_strategy: fixed        # fixed | percentile | val_opt
+    threshold_value: null            # fill after calibration (e.g., 1.023688)
+  # CNN: SF vs E
+  cnn_rule:
+    positive_class: environmental
+    decision_threshold: 0.17
+
+evaluation:
+  recon_error: mse
+  export_formats: [pdf, svg]

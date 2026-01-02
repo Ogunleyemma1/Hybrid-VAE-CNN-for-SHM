@@ -1,0 +1,82 @@
+# configs/4dof.yaml
+# 4DOF simulation experiment.
+# Purpose: validate Temporal VAE on multi-channel structural data and compare
+# normal vs structural fault regimes.
+
+project:
+  seed: 7
+
+paths:
+  experiment_dir: experiments/4dof
+  datasets_dir: experiments/4dof/datasets
+  outputs_dir: experiments/4dof/outputs
+
+data:
+  windowing:
+    window: 256
+    stride: 64
+  splits:
+    train_ratio: 0.4
+    val_ratio: 0.3
+    test_ratio: 0.3
+
+labels:
+  normal: normal
+  fault: structural_fault
+
+# The parameters below should mirror what your 4DOF generator actually uses.
+# Keep them explicit so reviewers can match configuration to generation.
+simulation_4dof:
+  dt: 0.01
+  t_total: 60.0
+  dof: 4
+  damping_model: proportional
+  forcing:
+    type: sinusoidal
+    apply_to_dof: 4
+    amplitude: 1.0
+    frequency_hz: 1.0
+
+dataset_generation:
+  # run counts
+  runs:
+    normal: 40
+    structural_fault: 40
+  # fault catalogue (examples; align with your actual generator)
+  structural_fault_types:
+    - stiffness_reduction
+    - damping_change
+    - mass_change
+  stiffness_reduction:
+    min_factor: 0.70
+    max_factor: 0.95
+  noise:
+    enabled: true
+    sigma: 0.0        # set >0 if you inject measurement noise
+
+normalization:
+  method: standard
+  clip: 10.0
+
+vae:
+  latent_dim: 3
+  hidden_dim: 96        # slightly larger often helps multichannel
+  num_layers: 2
+  dropout: 0.2
+  kl_anneal:
+    enabled: true
+    warmup_ratio: 0.30
+
+training:
+  batch_size: 256
+  epochs: 100
+  lr: 5.0e-4
+  grad_clip_norm: 2.0
+
+cnn:
+  enabled: false   # 4DOF can remain VAE-only unless you explicitly add CNN later
+
+evaluation:
+  recon_error: mse
+  latent_projection: pca
+  export_formats: [pdf, svg]
