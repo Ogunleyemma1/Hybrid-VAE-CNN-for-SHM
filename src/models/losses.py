@@ -1,7 +1,6 @@
 # src/models/losses.py
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Optional, Tuple
 
 import torch
@@ -9,19 +8,25 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-# -------------------------
+# -----------------------------------------------------------------------------
 # VAE losses
-# -------------------------
+# -----------------------------------------------------------------------------
 
-def vae_reconstruction_mse(recon: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+def reconstruction_loss(recon: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
     """
-    Mean-squared reconstruction error for continuous sensor time-series.
+    Reconstruction loss for continuous, multivariate time-series.
 
-    Shapes:
-        recon, target: (B, T, C)
+    Parameters
+    ----------
+    recon : torch.Tensor
+        Reconstructed signal of shape (B, T, C).
+    target : torch.Tensor
+        Ground-truth signal of shape (B, T, C).
 
-    Returns:
-        Scalar tensor: mean over all elements.
+    Returns
+    -------
+    torch.Tensor
+        Scalar tensor: mean squared error over all elements.
     """
     if recon.shape != target.shape:
         raise ValueError(f"Shape mismatch: recon={tuple(recon.shape)} vs target={tuple(target.shape)}")
@@ -30,17 +35,27 @@ def vae_reconstruction_mse(recon: torch.Tensor, target: torch.Tensor) -> torch.T
 
 def vae_kl_divergence(mu: torch.Tensor, logvar: torch.Tensor, reduction: str = "mean") -> torch.Tensor:
     """
-    KL divergence KL(q(z|x) || p(z)) with q = N(mu, diag(exp(logvar))), p = N(0, I).
+    KL divergence KL(q(z|x) || p(z)) for a diagonal Gaussian posterior.
 
-    We compute:
-        KL = 0.5 * sum_j (exp(logvar_j) + mu_j^2 - 1 - logvar_j)
+    q(z|x) = N(mu, diag(exp(logvar)))
+    p(z)   = N(0, I)
 
-    Scaling:
-        - reduction="mean": mean over batch (standard for stable training).
-        - reduction="sum": sum over batch.
+    KL per sample:
+        0.5 * sum_j (exp(logvar_j) + mu_j^2 - 1 - logvar_j)
 
-    Shapes:
-        mu, logvar: (B, Z)
+    Parameters
+    ----------
+    mu : torch.Tensor
+        Mean of q(z|x), shape (B, Z).
+    logvar : torch.Tensor
+        Log-variance of q(z|x), shape (B, Z).
+    reduction : str
+        "mean" (default) averages over batch; "sum" sums over batch.
+
+    Returns
+    -------
+    torch.Tensor
+        Scalar tensor: KL divergence reduced over batch.
     """
     if mu.shape != logvar.shape:
         raise ValueError(f"Shape mismatch: mu={tuple(mu.shape)} vs logvar={tuple(logvar.shape)}")
@@ -48,9 +63,13 @@ def vae_kl_divergence(mu: torch.Tensor, logvar: torch.Tensor, reduction: str = "
         raise ValueError("reduction must be 'mean' or 'sum'")
 
     kl_per_dim = 0.5 * (logvar.exp() + mu.pow(2) - 1.0 - logvar)  # (B, Z)
-    kl_per_sample = kl_per_dim.sum(dim=1)  # sum over latent dims => (B,)
+    kl_per_sample = kl_per_dim.sum(dim=1)  # (B,)
 
     return kl_per_sample.mean() if reduction == "mean" else kl_per_sample.sum()
+
+
+# Public alias for stable API naming
+kl_divergence = vae_kl_divergence
 
 
 def beta_vae_loss(
@@ -63,36 +82,53 @@ def beta_vae_loss(
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Beta-VAE objective:
-        L = recon_mse + beta * KL
+        L = reconstruction_loss + beta * KL
 
-    Returns:
-        total, recon_loss, kl_loss
+    Parameters
+    ----------
+    recon, target : torch.Tensor
+        Reconstruction and ground-truth, shape (B, T, C).
+    mu, logvar : torch.Tensor
+        Latent posterior parameters, shape (B, Z).
+    beta : float
+        Non-negative scaling factor for KL term.
+    kl_reduction : str
+        "mean" or "sum" reduction for KL.
+
+    Returns
+    -------
+    total : torch.Tensor
+    recon_loss : torch.Tensor
+    kl_loss : torch.Tensor
     """
     if beta < 0.0:
         raise ValueError("beta must be non-negative")
 
-    r = vae_reconstruction_mse(recon, target)
+    r = reconstruction_loss(recon, target)
     k = vae_kl_divergence(mu, logvar, reduction=kl_reduction)
     total = r + float(beta) * k
     return total, r, k
 
 
-# -------------------------
-# CNN loss (Focal)
-# -------------------------
+# -----------------------------------------------------------------------------
+# CNN loss (Weighted focal loss)
+# -----------------------------------------------------------------------------
 
 class WeightedFocalLoss(nn.Module):
     """
-    Weighted focal loss for classification with class imbalance.
+    Weighted focal loss for multi-class classification under class imbalance.
 
-    Args:
-        alpha: Optional tensor of shape (num_classes,) giving per-class weights.
-               If provided, alpha[target] rescales the loss per sample.
-        gamma: Focusing parameter (>= 0). Typical: 1-3.
+    This loss expects:
+    - logits: shape (B, num_classes) (unnormalized scores)
+    - targets: shape (B,) integer class indices
 
-    Notes:
-        - Expects logits (unnormalized scores).
-        - Targets are integer class indices.
+    Parameters
+    ----------
+    alpha : Optional[torch.Tensor]
+        1D tensor of shape (num_classes,) giving per-class weights.
+        When provided, alpha[targets] scales per-sample loss.
+    gamma : float
+        Focusing parameter (>= 0). Typical values: 1 to 3.
     """
     def __init__(self, alpha: Optional[torch.Tensor] = None, gamma: float = 2.0) -> None:
         super().__init__()
