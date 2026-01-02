@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Data and outputs (generated)
+experiments/**/datasets/raw/
+experiments/**/datasets/processed/
+experiments/**/outputs/
+
+# Optional: keep small sample datasets
+# !experiments/**/datasets/processed/sample_*.npy
+
+# Figures that are regenerated
+docs/paper_assets/_generated/
+
+# Torch checkpoints
+*.pt
+*.pth
+*.ckpt
