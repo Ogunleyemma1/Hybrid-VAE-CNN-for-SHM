@@ -1,0 +1,15 @@
+{
+  "seq_len": 80,
+  "stride": 1,
+  "train_frac": 0.5,
+  "input_dim": 12,
+  "latent_dim": 5,
+  "hidden_dim": 32,
+  "num_layers": 2,
+  "dropout": 0.2,
+  "n_epochs": 100,
+  "batch_size": 64,
+  "lr": 0.001,
+  "anneal_ratio": 0.3,
+  "csv_path": "C:\\Users\\pc\\Documents\\DIGITAL ENGINEERING\\Summer 2025\\Thesis\\Implementation\\Fault-Detection-with-Temporal-Variational-AutoEncoder\\1_DOF\\Data\\raw\\1dof_seen_variants.csv"
+}

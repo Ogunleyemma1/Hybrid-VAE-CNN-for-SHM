@@ -1,45 +1,35 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.so
 *.egg-info/
 dist/
 build/
 
-# Virtual environments
-.venv/
-venv/
-env/
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-
-# OS
+# Jupyter / OS
+.ipynb_checkpoints/
 .DS_Store
 Thumbs.db
 
-# Jupyter
-.ipynb_checkpoints/
-
-# Logs
-*.log
-
-# Data and outputs (generated)
-experiments/**/datasets/raw/
-experiments/**/datasets/processed/
-experiments/**/outputs/
-
-# Optional: keep small sample datasets
-# !experiments/**/datasets/processed/sample_*.npy
-
-# Figures that are regenerated
-docs/paper_assets/_generated/
-
-# Torch checkpoints
+# Models / binaries
 *.pt
 *.pth
-*.ckpt
+*.npy
+*.npz
+*.joblib
+
+# Outputs (figures, reports, etc.)
+**/Output/
+**/outputs/
+**/Figures/
+**/plots/
+**/reports/
+
+# Large raw media (optional—only if you don't want them tracked)
+# Large assets / raw artifacts (keep local, not in Git history)
+20250506_openLAB_tests/Photos/
+20250506_openLAB_tests/*.pdf
+*.pdf
+*.JPG
+*.jpg
+*.png
+

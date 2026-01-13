@@ -1,0 +1,54 @@
+{
+  "threshold": 1.2814043760299683,
+  "percentile": 99.0,
+  "window_len": 100,
+  "stride": 1,
+  "fit_data": "normal fraction (0.4, 0.7) only",
+  "score_def": "full_window_mse",
+  "healthy_frac": [
+    0.4,
+    0.7
+  ],
+  "n_val_windows_normal": 2010,
+  "n_val_windows_sensor": 804,
+  "n_val_windows_structural": 1206,
+  "seed": 42,
+  "splits_path": "C:/Users/pc/Documents/DIGITAL ENGINEERING/Summer 2025/Thesis/Implementation/Fault-Detection-with-Temporal-Variational-AutoEncoder/4DOF/Data/processed/run_splits.json",
+  "stats_path": "C:/Users/pc/Documents/DIGITAL ENGINEERING/Summer 2025/Thesis/Implementation/Fault-Detection-with-Temporal-Variational-AutoEncoder/4DOF/Data/processed/normal_stats.npz",
+  "model_path": "C:/Users/pc/Documents/DIGITAL ENGINEERING/Summer 2025/Thesis/Implementation/Fault-Detection-with-Temporal-Variational-AutoEncoder/4DOF/models/temporal_vae_state_dict.pt",
+  "score_summary": {
+    "normal_val": {
+      "n": 2010.0,
+      "mean": 0.6513149738311768,
+      "std": 0.21594171226024628,
+      "p50": 0.5895789861679077,
+      "p90": 0.9609264135360718,
+      "p95": 1.102989673614502,
+      "p99": 1.2814043760299683,
+      "max": 1.3148514032363892,
+      "min": 0.3586248755455017
+    },
+    "sensor_val": {
+      "n": 804.0,
+      "mean": 33.47447204589844,
+      "std": 38.13270568847656,
+      "p50": 14.88162612915039,
+      "p90": 100.02117156982422,
+      "p95": 116.09122467041016,
+      "p99": 131.26785278320312,
+      "max": 134.56951904296875,
+      "min": 7.3610734939575195
+    },
+    "structural_val": {
+      "n": 1206.0,
+      "mean": 38.31024932861328,
+      "std": 36.663185119628906,
+      "p50": 26.747997283935547,
+      "p90": 99.21922302246094,
+      "p95": 106.19599151611328,
+      "p99": 114.09644317626953,
+      "max": 115.36601257324219,
+      "min": 0.7774001359939575
+    }
+  }
+}

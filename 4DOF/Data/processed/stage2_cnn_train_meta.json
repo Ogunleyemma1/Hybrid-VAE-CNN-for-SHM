@@ -1,0 +1,11 @@
+{
+  "seed": 42,
+  "epochs": 50,
+  "batch_size": 100,
+  "learning_rate": 0.0001,
+  "weight_decay": 5e-05,
+  "dropout": 0.5,
+  "best_val_loss": 0.09741836420639798,
+  "split_source": "run_splits.json window_level_per_file",
+  "input_tensor": "stack([Z, (Z-Zhat)^2], channel) -> (N,2,T,D)"
+}

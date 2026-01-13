@@ -1,0 +1,24 @@
+{
+  "seed": 42,
+  "window_len": 100,
+  "stride": 1,
+  "train_frac": [
+    0.0,
+    0.4
+  ],
+  "val_frac": [
+    0.4,
+    0.7
+  ],
+  "epochs": 50,
+  "batch_size": 256,
+  "latent_dim": 16,
+  "hidden_dim": 128,
+  "num_layers": 2,
+  "dropout": 0.3,
+  "kl_warmup_ratio": 0.3,
+  "best_val_total": 0.6596902967982031,
+  "best_epoch": 7,
+  "protocol": "OLD-MATCH: fraction slicing before windowing; mean/std from normal/train fraction only; VAE trained on normal/train fraction only.",
+  "splits_path": "C:/Users/pc/Documents/DIGITAL ENGINEERING/Summer 2025/Thesis/Implementation/Fault-Detection-with-Temporal-Variational-AutoEncoder/4DOF/Data/processed/run_splits.json"
+}

@@ -1,0 +1,30 @@
+{
+  "seed": 42,
+  "fractions": {
+    "train_frac": 0.4,
+    "val_frac": 0.3,
+    "test_frac": 0.3
+  },
+  "train_runs": [
+    "MD_2025_05_06_10_43_20",
+    "MD_2025_05_06_13_43_17",
+    "MD_2025_05_06_16_07_15"
+  ],
+  "val_runs": [
+    "MD_2025_05_06_12_05_10",
+    "MD_2025_05_06_18_30_51"
+  ],
+  "test_runs": [
+    "MD_2025_05_06_09_08_25",
+    "MD_2025_05_06_17_39_40"
+  ],
+  "counts": {
+    "n_runs": 7,
+    "n_train_runs": 3,
+    "n_val_runs": 2,
+    "n_test_runs": 2,
+    "n_normal_train": 1004,
+    "n_normal_val": 256,
+    "n_normal_test": 605
+  }
+}
